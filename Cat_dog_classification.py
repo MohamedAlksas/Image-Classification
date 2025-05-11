@@ -40,4 +40,23 @@ test_set = test_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd
                                             target_size=(64, 64),
                                             batch_size=32,
                                             class_mode='binary')
+                                            # Building the CNN model
+cnn = tf.keras.models.Sequential()
+
+# First convolution and pooling layer
+cnn.add(tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu', input_shape=[64, 64, 3]))
+cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+
+# Second convolution and pooling layer
+cnn.add(tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu'))
+cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+
+# Flattening
+cnn.add(tf.keras.layers.Flatten())
+
+# Fully connected output layer
+cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
+
+# Compiling the CNN
+cnn.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
