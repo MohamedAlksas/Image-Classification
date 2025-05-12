@@ -1,71 +1,91 @@
-# 🐱🐶 Cat vs Dog Image Classifier
 
-## 📌 Project Description
+# Cat vs Dog Image Classifier 🐱🐶
 
-This project focuses on building an image classification model using Convolutional Neural Networks (CNNs) to distinguish between images of cats and dogs. The primary goal is to demonstrate how deep learning can be applied to binary classification tasks using a relatively simple CNN architecture
-
----
-
-## ⚙️ Setup Instructions
-
-### ✅ Prerequisites:
-- Python 3.7+
-- Basic understanding of neural networks and CNNs
-
-### 🛠️ Installation Steps:
-
-1. Clone the repository or download the project files.
-2. Install dependencies:
-   ```bash
-   pip install tensorflow pillow matplotlib
-   ```
-3. Dataset directory structure:
-   ```
-   cd_dataset/
-   ├── training_set/
-   │   ├── cats/
-   │   └── dogs/
-   └── testing_set/
-       ├── cats/
-       └── dogs/
-   ```
-
-> ⚠️ Make sure images are correctly labeled and in `.jpg` or `.png` format. Corrupted images will be automatically removed.
+This project is a Convolutional Neural Network (CNN) built with TensorFlow and Keras to classify images of cats and dogs. It includes data preprocessing, model training with augmentation and callbacks, single prediction, and model saving/loading.
 
 ---
 
-## ▶️ How to Run
+## 📁 Dataset Structure
 
-### Step-by-step Instructions:
+The dataset is split into **training** and **testing** sets.
 
-1. **Remove Corrupted Images**  
-   A built-in function checks and deletes unreadable or corrupted images from the dataset.
-
-2. **Data Augmentation & Loading**  
-   We use `ImageDataGenerator` to rescale, flip, shear, and zoom images to improve generalization.
-
-3. **Model Training**
-   - Model: Sequential CNN with 2 Conv2D + MaxPooling layers
-   - Activation: ReLU and Sigmoid
-   - Loss Function: Binary Crossentropy
-   - Optimizer: Adam
-   - Epochs: 25
-   - Batch Size: 32
-
-4. **Model Evaluation**
-   - Accuracy and Loss are calculated on the test set using `.evaluate()`.
-
-5. **Prediction Demo**
-   - A random image from the test set is selected and predicted.
-   - The prediction result and the image are displayed using `matplotlib`.
-
-To run:
-```bash
-python cat_dog_classifier.py
+```
+cd_dataset/
+├── training_set/
+│   ├── cats/
+│   └── dogs/
+└── testing_set/
+    ├── cats/
+    └── dogs/
 ```
 
+Each subfolder contains images of the respective class.
+
 ---
 
+## 📦 Libraries Used
+
+- TensorFlow / Keras
+- Pillow (PIL)
+- NumPy
+- Matplotlib
+- OS
+- Warnings
+
+---
+
+## 🧹 Preprocessing Steps
+
+1. **Corrupted Image Removal:**  
+   Scans the dataset and removes unreadable images using PIL's `verify()`.
+
+2. **Data Augmentation for Training:**
+   - Rescale (1./255)
+   - Random Shear
+   - Random Zoom
+   - Horizontal Flip
+
+3. **Testing Set:**
+   - Only rescaling applied.
+
+---
+
+## 🧠 Model Architecture
+
+A sequential CNN with the following layers:
+
+- Conv2D (32 filters) + MaxPooling
+- Conv2D (64 filters) + MaxPooling
+- Conv2D (128 filters) + MaxPooling
+- Flatten
+- Dense (128 units, ReLU) + Dropout (0.5)
+- Output Layer (1 unit, Sigmoid)
+
+**Loss Function:** Binary Crossentropy  
+**Optimizer:** Adam  
+**Metrics:** Accuracy  
+
+---
+
+## 🛑 Callbacks Used
+
+- **EarlyStopping**: Stops training when validation loss stops improving.
+- **ReduceLROnPlateau**: Reduces learning rate on a plateau in validation loss.
+
+---
+
+## 🚀 Training
+
+Model is trained for up to **50 epochs** with early stopping and learning rate reduction applied.
+
+```python
+cnn.fit(
+    x=training_set,
+    validation_data=test_set,
+    epochs=50,
+    callbacks=[early_stop, reduce_lr]
+)
+```
 ## 📈 Training Results
 
 | Metric           | Value (approx.)  |
@@ -80,13 +100,62 @@ Epoch 25/25
 loss: 0.2143 - accuracy: 0.9120
 Test Loss: 0.2321
 Test Accuracy: 0.8875
-```
+---
 
-The model performs well for a basic CNN architecture without transfer learning.
+## 🧪 Evaluation
+
+Model is evaluated on the testing set to report accuracy and loss:
+
+```python
+loss, accuracy = cnn.evaluate(test_set)
+```
 
 ---
 
-## 👥 Team Contributions
+## 🔍 Single Image Prediction
+
+The model can predict a random image from the testing set and visualize it with the predicted label (`Cat` or `Dog`).
+
+---
+
+## 💾 Model Saving & Loading
+
+Model is saved and reloaded using:
+
+```python
+cnn.save('CNN_model.keras')
+cnn = load_model('CNN_model.keras')
+```
+
+---
+
+## 📝 Requirements
+
+Install required packages via pip:
+
+```bash
+pip install tensorflow pillow matplotlib numpy
+```
+
+---
+
+## 📌 Notes
+
+- All images are resized to **64x64** before input.
+- Make sure your dataset path and structure match the script.
+- Trained model (`CNN_model.keras`) will be saved in the working directory.
+
+---
+
+## 📷 Sample Prediction
+
+Once prediction is made, the image is shown with the predicted label.
+
+![sample-prediction](./Screenshot-1.jpg)
+![sample-prediction](./Screenshot-2.jpg)
+
+---
+## 👥 Team Members
 
 | ID         | Name                        | 
 |------------|-----------------------------|
@@ -95,6 +164,3 @@ The model performs well for a basic CNN architecture without transfer learning.
 | 202203778  | Mohamed Magdy Ali           |  
 | 202202378  | Mohamed Abd-Elaal Elsayes   |    
 | 202203766  | Mohamed Tarek Hashad        | 
-
-
----
