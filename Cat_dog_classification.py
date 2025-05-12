@@ -60,3 +60,21 @@ cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
 # Compiling the CNN
 cnn.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
+# Data augmentation and preprocessing for training set
+train_datagen = ImageDataGenerator(rescale=1./255,
+                                   shear_range=0.2,
+                                   zoom_range=0.2,
+                                   horizontal_flip=True)
+
+training_set = train_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\training_set",
+                                                 target_size=(64, 64),
+                                                 batch_size=32,
+                                                 class_mode='binary')
+
+# Preprocessing for test set (no augmentation)
+test_datagen = ImageDataGenerator(rescale=1./255)
+test_set = test_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\testing_set",
+                                            target_size=(64, 64),
+                                            batch_size=32,
+                                            class_mode='binary')
+
