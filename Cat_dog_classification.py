@@ -1,11 +1,18 @@
+# Import Important Library
+
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import warnings
-warnings.filterwarnings("ignore")
-import os
+warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 from PIL import Image
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+import os
+import random
+import numpy as np
+from keras.preprocessing import image
+import matplotlib.pyplot as plt
 
-# Function to remove corrupted images from a folder
+# Remove Corrupted Images
 def remove_corrupted_images(folder_path):
     removed = 0
     for root, dirs, files in os.walk(folder_path):
@@ -13,70 +20,72 @@ def remove_corrupted_images(folder_path):
             filepath = os.path.join(root, file)
             try:
                 with Image.open(filepath) as img:
-                    img.verify()  # Check if image is readable
+                    img.verify()  
             except Exception as e:
                 print(f"Corrupted image removed: {filepath}")
                 os.remove(filepath)
                 removed += 1
     print(f"\nTotal corrupted images removed: {removed}")
 
-# Remove corrupted images from training and testing datasets
-remove_corrupted_images(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\training_set")
-remove_corrupted_images(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\testing_set")
-# Data augmentation and preprocessing for training set
-train_datagen = ImageDataGenerator(rescale=1./255,
-                                  shear_range=0.2,
-                                  zoom_range=0.2,
-                                  horizontal_flip=True)
+remove_corrupted_images(r"C:\Users\momag\OneDrive\Desktop\Projects_for_ alGam3aa\cd_dataset\training_set")
+remove_corrupted_images(r"C:\Users\momag\OneDrive\Desktop\Projects_for_ alGam3aa\cd_dataset\testing_set")
 
-training_set = train_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\training_set",
-                                                target_size=(64, 64),
-                                                batch_size=32,
-                                                class_mode='binary')
+# Data Preprocessing
+train_datagen = ImageDataGenerator(rescale = 1./255,
+                                   shear_range = 0.2,
+                                   zoom_range = 0.2,
+                                   horizontal_flip = True)
+training_set = train_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\Projects_for_ alGam3aa\cd_dataset\training_set",
+                                                 target_size = (64, 64),
+                                                 batch_size = 32,
+                                                 class_mode = 'binary')
 
-# Preprocessing for test set (no augmentation)
-test_datagen = ImageDataGenerator(rescale=1./255)
-test_set = test_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\testing_set",
-                                            target_size=(64, 64),
-                                            batch_size=32,
-                                            class_mode='binary')
-                                            # Building the CNN model
+test_datagen = ImageDataGenerator(rescale = 1./255)
+test_set = test_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\Projects_for_ alGam3aa\cd_dataset\testing_set",
+                                            target_size = (64, 64),
+                                            batch_size = 32,
+                                            class_mode = 'binary')
+#Build CNN Model
+
 cnn = tf.keras.models.Sequential()
+cnn.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)))
+cnn.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 
-# First convolution and pooling layer
-cnn.add(tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu', input_shape=[64, 64, 3]))
-cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+cnn.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+cnn.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 
-# Second convolution and pooling layer
-cnn.add(tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='relu'))
-cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+cnn.add(tf.keras.layers.Conv2D(128, (3, 3), activation='relu'))
+cnn.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 
-# Flattening
 cnn.add(tf.keras.layers.Flatten())
+cnn.add(tf.keras.layers.Dense(128, activation='relu'))
+cnn.add(tf.keras.layers.Dropout(0.5))
+cnn.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 
-# Fully connected output layer
-cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
+# Training the CNN
+cnn.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
-# Compiling the CNN
-cnn.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+early_stop = EarlyStopping(
+    monitor='val_loss',     
+    patience=5,             
+    restore_best_weights=True  
+)
 
-# Data augmentation and preprocessing for training set
-train_datagen = ImageDataGenerator(rescale=1./255,
-                                   shear_range=0.2,
-                                   zoom_range=0.2,
-                                   horizontal_flip=True)
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.2,             
+    patience=3,             
+    min_lr=1e-6            
+)
 
-training_set = train_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\training_set",
-                                                 target_size=(64, 64),
-                                                 batch_size=32,
-                                                 class_mode='binary')
+cnn.fit(
+    x=training_set,
+    validation_data=test_set,
+    epochs=50,
+    callbacks=[early_stop, reduce_lr]
+)
 
-# Preprocessing for test set (no augmentation)
-test_datagen = ImageDataGenerator(rescale=1./255)
-test_set = test_datagen.flow_from_directory(r"C:\Users\momag\OneDrive\Desktop\cd_dataset\testing_set",
-                                            target_size=(64, 64),
-                                            batch_size=32,
-                                            class_mode='binary')
+#Training the CNNEvaluate Model¶
 
 
 import random
