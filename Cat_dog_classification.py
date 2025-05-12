@@ -85,39 +85,40 @@ cnn.fit(
     callbacks=[early_stop, reduce_lr]
 )
 
-#Training the CNNEvaluate Model¶
+#Training the CNN Evaluate Model
+
+loss, accuracy = cnn.evaluate(test_set)
+print(f"Test Loss: {loss}")
+print(f"Test Accuracy: {accuracy}")
 
 
-import random
-import numpy as np
-from keras.preprocessing import image
-import matplotlib.pyplot as plt
+# Making a single prediction
+test_dir = r"C:\Users\momag\OneDrive\Desktop\Projects_for_ alGam3aa\cd_dataset\testing_set"
 
-# Path to test dataset
-test_dir = r"C:\Users\momag\OneDrive\Desktop\cd_dataset\testing_set"
-
-# Select a random class (e.g., 'cats' or 'dogs')
 random_class = random.choice(os.listdir(test_dir))
 
-# Select a random image from the chosen class
 class_path = os.path.join(test_dir, random_class)
 random_image_file = random.choice(os.listdir(class_path))
 image_path = os.path.join(class_path, random_image_file)
 
-# Load and preprocess the image for prediction
+original_image = Image.open(image_path)
+
 test_image = image.load_img(image_path, target_size=(64, 64))
 img_array = image.img_to_array(test_image)
 img_array = np.expand_dims(img_array, axis=0)
-img_array = img_array / 255.0  # Normalize the image
+img_array = img_array / 255.0  # Normalization
 
-# Perform prediction
 result = cnn.predict(img_array)
 
-# Determine predicted label
 predicted_label = 'Dog' if result[0][0] > 0.5 else 'Cat'
 
-# Display the image with prediction
-plt.imshow(test_image)
+plt.imshow(original_image)
 plt.title(f"Prediction: {predicted_label}")
 plt.axis('off')
 plt.show()
+
+# Save And Load Model
+cnn.save('CNN_model.keras')
+
+from keras.models import load_model
+cnn = load_model('CNN_model.keras')
