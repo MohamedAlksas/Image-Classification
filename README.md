@@ -164,3 +164,17 @@ Once prediction is made, the image is shown with the predicted label.
 | 202203778  | Mohamed Magdy Ali           |  
 | 202202378  | Mohamed Abd-Elaal Elsayes   |    
 | 202203766  | Mohamed Tarek Hashad        | 
+---
+
+## 🔗 References
+
+- [TensorFlow Documentation](https://www.tensorflow.org/api_docs)
+- [Keras API Reference](https://keras.io/api/)
+- [Pillow (PIL) Documentation](https://pillow.readthedocs.io/en/stable/)
+- [NumPy Documentation](https://numpy.org/doc/)
+- [Matplotlib Documentation](https://matplotlib.org/stable/contents.html)
+- [ImageDataGenerator Guide - Keras](https://keras.io/api/preprocessing/image/)
+- [EarlyStopping & ReduceLROnPlateau Callbacks - Keras](https://keras.io/api/callbacks/)
+- [Kaggle Cats and Dogs Dataset](https://www.microsoft.com/en-us/download/details.aspx?id=54765)
+
+---
