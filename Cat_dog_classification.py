@@ -122,3 +122,55 @@ cnn.save('CNN_model.keras')
 
 from keras.models import load_model
 cnn = load_model('CNN_model.keras')
+
+import os
+import random
+import numpy as np
+import tkinter as tk
+from tkinter import Label, Button
+from PIL import Image, ImageTk
+from keras.preprocessing import image
+import tensorflow as tf
+
+
+test_dir = r"C:\Users\momag\OneDrive\Desktop\Projects_for_ alGam3aa\cd_dataset\testing_set"
+
+def predict_random_image():
+    global img_display  
+    random_class = random.choice(os.listdir(test_dir))
+    class_path = os.path.join(test_dir, random_class)
+    random_image_file = random.choice(os.listdir(class_path))
+    image_path = os.path.join(class_path, random_image_file)
+
+    original_image = Image.open(image_path)
+    original_image = original_image.resize((300, 300))  
+    img_display = ImageTk.PhotoImage(original_image)
+    image_label.config(image=img_display)
+
+    test_image = image.load_img(image_path, target_size=(64, 64))
+    img_array = image.img_to_array(test_image)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array / 255.0
+
+    result = cnn.predict(img_array)
+    predicted_label = 'Dog' if result[0][0] > 0.5 else 'Cat'
+    prediction_label.config(text=f"Prediction: {predicted_label}", font=("Arial", 14))
+
+window = tk.Tk()
+window.title("Cat vs Dog Classifier")
+window.geometry("400x420")
+window.resizable(False, False)
+
+image_label = Label(window)
+image_label.pack(pady=10)
+
+prediction_label = Label(window, text="Click the button to predict", font=("Arial", 14))
+prediction_label.pack(pady=5)
+
+predict_button = Button(window, text="Load Random Image", command=predict_random_image, font=("Arial", 12))
+predict_button.pack(pady=10)
+
+exit_button = Button(window, text="Exit", command=window.destroy, font=("Arial", 12), bg="red", fg="white")
+exit_button.pack(pady=5)
+
+window.mainloop()
